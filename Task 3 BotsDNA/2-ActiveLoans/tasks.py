@@ -1,6 +1,6 @@
 from robocorp.tasks import task
 
 @task
-def minimal_task():
-    message = "Hello"
-    message = message + " World!"
+def active_loans():
+    """Get details of customer and store it in the input.xlsx file"""
+    
