@@ -29,8 +29,8 @@ def scrape_business_details():
 
 def switch_industry(urls):
     """Go from one industry to the other, for example: advertising, events, travel, etc."""
-    for i in range(len(urls)):
-        get_data(urls[i])
+    
+    get_data(urls[0])
 
 def get_data(current_url):
     """Get data from a specific page and write it into an Excel file."""
