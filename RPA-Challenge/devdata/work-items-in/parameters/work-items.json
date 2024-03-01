@@ -1,9 +1,9 @@
 [
   {
       "payload": {
-         "search phrase":"2024 football season",
-          "category":"football",
-          "numberofmonths":1
+         "search phrase":"Football",
+          "category":"All",
+          "timespan":"1 month"
       },
       "files": {
       }
