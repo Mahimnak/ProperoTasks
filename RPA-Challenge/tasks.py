@@ -189,6 +189,7 @@ def navigate_webpage(details):
             print("Oops took too long mate! Sometimes it's better to finish quickly!")
     #calling the function to start scraping from first page
     store_and_add_data()
+    
 def fetch_workitems():
     """Fetch the payload and details from the input work-items"""
     item = workitems.inputs.current
