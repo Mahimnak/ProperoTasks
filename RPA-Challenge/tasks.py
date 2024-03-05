@@ -22,18 +22,34 @@ import os
 from PIL import Image
 import io
 import requests
+import logging
+
+logging.basicConfig(
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler("news_data.log"),
+        logging.StreamHandler(),
+    ],
+)
+logger = logging.getLogger("news_data")
 
 @task
 def news_data():
     """Search for and scrape data from news websites."""
+    logger.info("Fetching work items...")
     details = fetch_workitems()
+    logger.info("Creating Excel file...")
     create_excel()
+    logger.info("Navigating webpage...")
     navigate_webpage(details)
+
 
 def create_excel():
     """Create an excel file and add headings for required columns"""
     global wb, ws
     # Create a workbook and select the active worksheet
+    logger.info("Creating Excel file...")
     wb = Workbook()
     ws = wb.active
     
@@ -51,6 +67,7 @@ def navigate_webpage(details):
     """Navigate to the Reuters news website and collect data"""
     # try:
     #initialise the driver using selenium and chromium web driver
+    logger.info("Navigating to Reuters news website...")
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-certificate-errors')
     driver = webdriver.Chrome(options=options)
@@ -162,12 +179,14 @@ def navigate_webpage(details):
                         img = Image.open(io.BytesIO(response.content))
                         img.save(image_link)                        
                     except NoSuchElementException:
+                        logger.error("Exception occurred while finding an image tag")
                         image_link="No image here!"
                     
                     #adding data to the excel file
                     ws.append([heading,date,search_phrases_in_title,money_in_title,image_link])
                     wb.save("NewsData.xlsx")
                 except NoSuchElementException:
+                        logger.error("Exception occurred while finding a row")
                         continue
             #going to the next page if it exists and getting details of that page
             try:
@@ -177,21 +196,23 @@ def navigate_webpage(details):
                 next_page.click()                
                 if driver.current_url == previous_url:
                     time.sleep(3)
-                    print("Yay all the data is extracted, job done mate!")
+                    
                 else:
                     store_and_add_data()
             except NoSuchElementException:
-                print("Yay all the data is extracted, job done mate!")            
+                logger.info("Well fortunately all the data was extracted so no more data to be extracted!")
+                            
             
         except NoSuchElementException:
-            print("Couldn't find any element with given req. Get better buddy!")
+            logger.error("Couldn't find any element with given req. Get better buddy!")
         except TimeoutException:
-            print("Oops took too long mate! Sometimes it's better to finish quickly!")
+            logger.error("Couldn't find any element with given req. Get better buddy!")
     #calling the function to start scraping from first page
     store_and_add_data()
     
 def fetch_workitems():
     """Fetch the payload and details from the input work-items"""
+    logger.debug("Fetching work-items payload...")
     item = workitems.inputs.current
     payload = item.payload
     # Access the data from the payload
@@ -199,8 +220,9 @@ def fetch_workitems():
     category = payload.get('category')
     number_of_months = payload.get('timespan')
 
-    details = [search_phrase,category,number_of_months]
-
+    logger.debug("Returning work-items details...")
+    details = [search_phrase, category, number_of_months]
     return details
+
 
     
