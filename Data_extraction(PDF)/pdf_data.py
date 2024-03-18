@@ -1,6 +1,9 @@
 import unicodedata
 import re
 import fitz
+import requests
+import tempfile
+import os
 import openpyxl
 import pandas as pd
 
@@ -14,6 +17,15 @@ class pdf_data:
         cleaned_text = cleaned_text.replace('/', '')
         return cleaned_text.strip()
 
+    def download_pdf(self, pdf_url, save_path):
+        response = requests.get(pdf_url)
+        if response.status_code == 200:
+            with open(save_path, 'wb') as f:
+                f.write(response.content)
+        else:
+            raise Exception("Failed to download PDF from the provided URL")
+
+        
     def extract_tables_from_pdf(self):
         tables_data = []
         with fitz.open(self.pdf_path) as pdf:
@@ -56,12 +68,20 @@ class pdf_data:
                 hyperlinks.append(hyperlink)
         tech_specs = hyperlinks[1]["url"]
         return tech_specs
+
+
+
+  
     
 def main():
-    pdf_path = "GeM-Bidding-5927594.pdf"
-    # excel_file = "tables_from_pdf.xlsx"
-    # save_tables_to_excel(pdf_tables, excel_file)
-    # print(f"Tables saved to {excel_file}")
+    pdf_path = "https://mkp.gem.gov.in/uploaded_documents/51/16/877/OrderItem/BoqDocument/2024/1/20/gem_nit-final_2024-01-20-11-42-11_976251cc06053ae9af6f3014a0a36c40.pdf"
+    pdf = pdf_data("gem_nit-final_2024-01-20-11-42-11_976251cc06053ae9af6f3014a0a36c40.pdf")
+    table = pdf.extract_tables_from_pdf()
+    pdf.save_tables_to_excel(table, "technical_specification")
+
+    pdf_filename = os.path.basename(pdf_path)
+    save_path = os.path.join(os.path.dirname(__file__), pdf_filename)  # Save in the same directory as the program
+    pdf.download_pdf(pdf_path,save_path)
 
 if __name__ == "__main__":
     main()
