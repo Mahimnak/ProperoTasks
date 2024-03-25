@@ -36,12 +36,25 @@ class pdf_data:
                 # Extract table data
                 table_data = table.extract()
                 cleaned_table_data = [[self.remove_non_ascii(cell) if cell else None for cell in row] for row in table_data]
+                # Transpose the table data to convert from column-wise to row-wise
+                transposed_table_data = list(map(list, zip(*cleaned_table_data)))
                 # Convert table data to DataFrame
-                df = pd.DataFrame(cleaned_table_data[1:], columns=cleaned_table_data[0])
-                # # Append DataFrame to list
+                df = pd.DataFrame(transposed_table_data[1:], columns=transposed_table_data[0])
+                # Append DataFrame to list
                 tables_data.append(df)
         return tables_data
 
+    def add_link_excel(self, link):
+        workbook = openpyxl.load_workbook("tables_from_pdf.xlsx")
+        worksheet = workbook.get_sheet_by_name("bid_details")
+
+        max_row = worksheet.max_row+1
+        worksheet.cell(row =  max_row, column = 1).value = "Technical specification"
+        worksheet.cell(row =  max_row, column = 2).value = link
+        workbook.save("tables_from_pdf.xlsx")
+        workbook.close()
+
+        
     def save_tables_to_excel(self, tables, worksheet_name):
         workbook = openpyxl.load_workbook("tables_from_pdf.xlsx")
         worksheet = workbook.get_sheet_by_name(worksheet_name)
