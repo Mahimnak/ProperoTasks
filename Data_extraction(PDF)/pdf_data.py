@@ -25,7 +25,19 @@ class pdf_data:
         else:
             raise Exception("Failed to download PDF from the provided URL")
 
-        
+    def text_data_test(self):
+        pdf = fitz.open(self.pdf_path)
+        # Iterate over each page
+        for page in pdf:
+            # Get the text of the page
+            page_text = page.get_text()
+            # Split the text into lines
+            lines = page_text.split("\n")
+            # Iterate over each line
+            for line in lines:
+                # Do something with the line
+                print(line)
+
     def extract_tables_from_pdf(self):
         tables_data = []
         with fitz.open(self.pdf_path) as pdf:
@@ -36,11 +48,9 @@ class pdf_data:
                 # Extract table data
                 table_data = table.extract()
                 cleaned_table_data = [[self.remove_non_ascii(cell) if cell else None for cell in row] for row in table_data]
-                # Transpose the table data to convert from column-wise to row-wise
-                transposed_table_data = list(map(list, zip(*cleaned_table_data)))
                 # Convert table data to DataFrame
-                df = pd.DataFrame(transposed_table_data[1:], columns=transposed_table_data[0])
-                # Append DataFrame to list
+                df = pd.DataFrame(cleaned_table_data[1:], columns=cleaned_table_data[0])
+                # # Append DataFrame to list
                 tables_data.append(df)
         return tables_data
 
@@ -88,13 +98,14 @@ class pdf_data:
     
 def main():
     pdf_path = "https://mkp.gem.gov.in/uploaded_documents/51/16/877/OrderItem/BoqDocument/2024/1/20/gem_nit-final_2024-01-20-11-42-11_976251cc06053ae9af6f3014a0a36c40.pdf"
-    pdf = pdf_data("gem_nit-final_2024-01-20-11-42-11_976251cc06053ae9af6f3014a0a36c40.pdf")
-    table = pdf.extract_tables_from_pdf()
-    pdf.save_tables_to_excel(table, "technical_specification")
+    pdf = pdf_data("GeM-Bidding-5927594.pdf")
+    pdf.text_data_test()
+    # table = pdf.extract_tables_from_pdf()
+    # pdf.save_tables_to_excel(table, "technical_specification")
 
-    pdf_filename = os.path.basename(pdf_path)
-    save_path = os.path.join(os.path.dirname(__file__), pdf_filename)  # Save in the same directory as the program
-    pdf.download_pdf(pdf_path,save_path)
+    # pdf_filename = os.path.basename(pdf_path)
+    # save_path = os.path.join(os.path.dirname(__file__), pdf_filename)  # Save in the same directory as the program
+    # pdf.download_pdf(pdf_path,save_path)
 
 if __name__ == "__main__":
     main()
