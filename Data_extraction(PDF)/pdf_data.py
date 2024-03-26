@@ -12,33 +12,23 @@ class pdf_data:
         self.pdf_path = pdf_path
 
     def remove_non_ascii(self, text)->str:
+        """Clean the text extracted from the table and remove any unwanted characters."""
         cleaned_text = re.sub(r'[^\x00-\x7F]', '', text)
         cleaned_text = re.sub(r'[\u263a-\U0001f645]', '', cleaned_text)
         cleaned_text = cleaned_text.replace('/', '')
         return cleaned_text.strip()
 
-    def download_pdf(self, pdf_url, save_path):
-        response = requests.get(pdf_url)
-        if response.status_code == 200:
-            with open(save_path, 'wb') as f:
-                f.write(response.content)
-        else:
-            raise Exception("Failed to download PDF from the provided URL")
+    # def download_pdf(self, pdf_url, save_path):
+    #     response = requests.get(pdf_url)
+    #     if response.status_code == 200:
+    #         with open(save_path, 'wb') as f:
+    #             f.write(response.content)
+    #     else:
+    #         raise Exception("Failed to download PDF from the provided URL")
 
-    def text_data_test(self):
-        pdf = fitz.open(self.pdf_path)
-        # Iterate over each page
-        for page in pdf:
-            # Get the text of the page
-            page_text = page.get_text()
-            # Split the text into lines
-            lines = page_text.split("\n")
-            # Iterate over each line
-            for line in lines:
-                # Do something with the line
-                print(line)
 
-    def extract_tables_from_pdf(self):
+    def extract_tables_from_pdf(self)->list:
+        """Extract the table from the pdf one row at a time and return the data."""
         tables_data = []
         with fitz.open(self.pdf_path) as pdf:
             page = pdf[0]
@@ -54,7 +44,8 @@ class pdf_data:
                 tables_data.append(df)
         return tables_data
 
-    def add_link_excel(self, link):
+    def add_link_excel(self, link)->None:
+        """After getting the link to the technical specification pdf add it to the excel file."""
         workbook = openpyxl.load_workbook("tables_from_pdf.xlsx")
         worksheet = workbook.get_sheet_by_name("bid_details")
 
@@ -65,7 +56,8 @@ class pdf_data:
         workbook.close()
 
         
-    def save_tables_to_excel(self, tables, worksheet_name):
+    def save_tables_to_excel(self, tables, worksheet_name)->None:
+        """Add the table rows to the excel file."""
         workbook = openpyxl.load_workbook("tables_from_pdf.xlsx")
         worksheet = workbook.get_sheet_by_name(worksheet_name)
         for idx, table_df in enumerate(tables):
@@ -78,6 +70,7 @@ class pdf_data:
         workbook.save("tables_from_pdf.xlsx")
 
     def extract_hyperlinks_from_pdf(self)->str:
+        """Get the link to the technical specification pdf and return it as a string."""
         hyperlinks = []
         with fitz.open(self.pdf_path) as pdf:
             page = pdf[2]
@@ -110,3 +103,18 @@ def main():
 if __name__ == "__main__":
     main()
 
+
+
+
+# def text_data_test(self):
+    #     pdf = fitz.open(self.pdf_path)
+    #     # Iterate over each page
+    #     for page in pdf:
+    #         # Get the text of the page
+    #         page_text = page.get_text()
+    #         # Split the text into lines
+    #         lines = page_text.split("\n")
+    #         # Iterate over each line
+    #         for line in lines:
+    #             # Do something with the line
+    #             print(line)

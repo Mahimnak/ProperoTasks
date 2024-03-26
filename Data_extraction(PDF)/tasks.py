@@ -9,6 +9,7 @@ def main_task():
     """
     
     try:
+        # Enter the pdf path here or use a file picker dialog to select it
         pdf_path = "GeM-Bidding-5927594.pdf"
         pdf = pdf_data(pdf_path)
         
@@ -18,7 +19,6 @@ def main_task():
             pdf.save_tables_to_excel(tables, "bid_details")
         except Exception as e:
             print(f"Error extracting bid details tables: {e}")
-        
         # Extract technical specifications hyperlink
         try:
             link = pdf.extract_hyperlinks_from_pdf()
@@ -26,8 +26,5 @@ def main_task():
         except Exception as e:
             print(f"Error extracting technical specifications hyperlink: {e}")
             return  # Exit the task if unable to extract hyperlink
-        
-        # Download PDF from the hyperlink
-        
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
