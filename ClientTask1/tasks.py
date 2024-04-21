@@ -1,4 +1,6 @@
 from robocorp.tasks import task
-
+from main import Order
 @task
-def minimal_task():
+def task():
+    order = Order()
+    order.get_data()
