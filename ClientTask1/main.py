@@ -34,9 +34,10 @@ class Order:
 
             # Write the DataFrame to an XLSX file
             df.to_excel('input\Input.xlsx', index=False)
-
+            return "Task completed"
         except Exception as e:
-            print(f"Error converting CSV to XLSX: {e}")
+            return f"Error converting CSV to XLSX: {e}"
+            
 
     def extract_integer(self, string):
         """Extract integer from a string."""
@@ -58,11 +59,20 @@ class Order:
 
             # Create the output file
             self.create_output_file()
-            self.csv_to_xlsx_file()
+            csv_xlsx = self.csv_to_xlsx_file()
+            
+            if csv_xlsx == "Task completed":
+                wb = openpyxl.load_workbook(f'input\Input.xlsx')
+                ws = wb.active
+            else:
+                try:
+                    wb = openpyxl.load_workbook(f'input\Input.xlsx')
+                    ws = wb.active
+                except Exception as e:
+                    raise FileNotFoundError("Unable to locate the Input file.")
 
             # Load the input file
-            wb = openpyxl.load_workbook(f'input\Input.xlsx')
-            ws = wb.active
+            
 
             # Store data in lists
             col_a = [cell.value for cell in ws['A'][1:] if cell.value is not None]
