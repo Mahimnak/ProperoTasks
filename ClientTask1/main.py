@@ -1,6 +1,8 @@
 import openpyxl
+import csv
 import xlrd
 from xls2xlsx import XLS2XLSX
+import pandas as pd
 import re
 
 class Order:
@@ -25,6 +27,17 @@ class Order:
         except Exception as e:
             print(f"Error converting to xlsx file: {e}")
 
+    def csv_to_xlsx_file(self, filename = "input\input.csv"):
+        """Convert a .csv file to .xlsx file for easier formatting."""
+        try:
+            df = pd.read_csv('input\input.csv')
+
+            # Write the DataFrame to an XLSX file
+            df.to_excel('input\Input.xlsx', index=False)
+
+        except Exception as e:
+            print(f"Error converting CSV to XLSX: {e}")
+
     def extract_integer(self, string):
         """Extract integer from a string."""
         try:
@@ -45,10 +58,11 @@ class Order:
 
             # Create the output file
             self.create_output_file()
+            self.csv_to_xlsx_file()
 
             # Load the input file
-            wb = openpyxl.load_workbook(f'Order_Statement.xlsx')
-            ws = wb.get_sheet_by_name("Input File")
+            wb = openpyxl.load_workbook(f'input\Input.xlsx')
+            ws = wb.active
 
             # Store data in lists
             col_a = [cell.value for cell in ws['A'][1:] if cell.value is not None]
@@ -109,8 +123,8 @@ class Order:
             col_counter = 1
             row_counter = 1
 
-            wb1 = openpyxl.load_workbook('Order_Statement.xlsx')
-            ws1 = wb1.get_sheet_by_name("Input File")
+            wb1 = openpyxl.load_workbook('input\Input.xlsx')
+            ws1 = wb1.active
 
             wb2 = openpyxl.load_workbook(f'output/Output.xlsx')
             ws2 = wb2.active
